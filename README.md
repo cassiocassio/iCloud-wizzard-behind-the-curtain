@@ -109,6 +109,17 @@ read is the one thing not to ship — it is the hang. No shipping Mac app shows 
 label or a per-file cancel today; the label is a small step past the field, and it
 costs one line.
 
+**The third illusion, and it is the writer's.** You copied `~/Code` into a folder
+inside iCloud Drive, the copy finished, the dot went green: your files are backed up.
+The truth is that a file written into `~/Library/Mobile Documents` is a *local* file
+until the upload daemon gets to it, and if the laptop goes into the canal in that
+window the "backup" goes with it. Measured on this Mac, 4 Sep 2026, from the backup
+tool's own state records: the last byte of a 6.7 GB mirror reached the cloud
+**63 minutes** after the copy finished on the morning run and **2 minutes** after
+the evening one. Same tool, same day, same folder. The only honest verdict is two
+facts with two ages — *copied* (the transfer) and *uploaded* (per file,
+`ubiquitousItemIsUploaded`) — and "backed up" is the second one, never the first.
+
 **A writer** (you put files *into* iCloud: a mirror, an export, a sync) must never
 read the destination: under OFF the read aborts, under ON it downloads stale bytes
 you are about to overwrite. Copy to a temp name *beside* the destination and
