@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>What you can tell the user about an evicted file</title>
+<style>
+  :root { color-scheme: light dark;
+    --bg: #f5f5f7; --panel: #fff; --ink: #1d1d1f; --mute: #6e6e73; --line: #d2d2d7;
+    --ok: #34c759; --warn: #ff9f0a; --bad: #ff3b30; --blue: #007aff; --tint: #f0f0f3; }
+  @media (prefers-color-scheme: dark) { :root {
+    --bg: #1c1c1e; --panel: #2c2c2e; --ink: #f5f5f7; --mute: #98989d; --line: #3a3a3c; --tint: #3a3a3c; } }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 14px/1.45 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif; }
+  main { max-width: 1180px; margin: 0 auto; padding: 32px 20px 64px; }
+  h1 { font-size: 26px; letter-spacing: -0.01em; margin: 0 0 6px; }
+  .lede { color: var(--mute); max-width: 72ch; margin: 0 0 28px; }
+  .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+  section { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 16px 8px; }
+  section > h2 { font-size: 15px; margin: 0 0 4px; display: flex; align-items: center; gap: 8px; }
+  section > p { color: var(--mute); font-size: 13px; margin: 0 0 12px; }
+  .pill { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 999px; color: #fff; }
+  .pill.ok { background: var(--ok); } .pill.no { background: var(--mute); } .pill.lie { background: var(--bad); }
+  .row { border-top: 1px solid var(--line); padding: 12px 0; }
+  .ui { background: var(--tint); border-radius: 8px; padding: 10px 12px; display: flex; align-items: center; gap: 10px; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+  .dot.ok { background: var(--ok); } .dot.warn { background: var(--warn); } .dot.bad { background: var(--bad); } .dot.blue { background: var(--blue); }
+  .ui .t { flex: 1; min-width: 0; } .ui .t b { display: block; font-weight: 600; } .ui .t span { color: var(--mute); font-size: 12.5px; }
+  .btn { font-size: 12px; padding: 3px 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+  .btn.primary { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .spinner { width: 14px; height: 14px; border: 2px solid var(--line); border-top-color: var(--blue); border-radius: 50%; animation: spin 1s linear infinite; flex: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .pie { width: 16px; height: 16px; border-radius: 50%; flex: none;
+    background: conic-gradient(var(--blue) 0 40%, var(--line) 40% 100%); }
+  .basis { font-size: 12px; color: var(--mute); margin: 6px 2px 0; }
+  .basis code { font-size: 11.5px; }
+  .basis .tag { font-weight: 600; letter-spacing: 0.02em; font-size: 10.5px; }
+  .strike { text-decoration: line-through; text-decoration-color: var(--bad); }
+  footer { color: var(--mute); font-size: 12.5px; margin-top: 28px; max-width: 80ch; }
+</style>
+</head>
+<body>
+<main>
+  <h1>What you can tell the user about an evicted file</h1>
+  <p class="lede">iCloud Drive lets people stop caring where their data is — local or in the cloud, kept either way, never
+  limited by the device or by free space — while keeping the familiar surface of a disk with files in folders. That is a
+  goal worth applauding, and for almost every app the abstraction is exactly right; this page is not an argument against it. It is for the moment an app has to set an
+  expectation anyway — a wait, a verdict, a promise — and wants to do that with the truth, without misleading anyone and
+  without breaking the mental model the system has built. Here is the inventory. Every row names the API it stands on, or the search that found none.
+  Measured on macOS 26.4.1, 4 September 2026; macOS 27 changes none of it.</p>
+
+  <div class="cols">
+
+  <section>
+    <h2><span class="pill ok">POSSIBLE</span> What you can honestly show</h2>
+    <p>Everything here is metadata, or a bound you set yourself.</p>
+
+    <div class="row">
+      <div class="ui"><div class="spinner"></div><div class="t"><b>Waiting for iCloud Drive…</b><span>interview-07.mp4 · 1.2 GB</span></div></div>
+      <div class="basis"><span class="tag">MEASURED</span> · <code>SF_DATALESS</code> in <code>st_flags</code> says it is a placeholder, <code>ubiquitousItemIsDownloading</code> (a Bool, iCloud only) says the fetch is in flight, <code>startDownloadingUbiquitousItem</code> asked for it in 1–3 ms.</div>
+    </div>
+
+    <div class="row">
+      <div class="ui"><div class="spinner"></div><div class="t"><b>Downloading from OneDrive…</b><span>no progress is available from this provider</span></div></div>
+      <div class="basis"><span class="tag">MEASURED</span> · the flag is provider-agnostic; for Google Drive / OneDrive / Dropbox the label is <em>all</em> you get — say so rather than fake a bar.</div>
+    </div>
+
+    <div class="row">
+      <div class="ui"><div class="dot warn"></div><div class="t"><b>Still waiting after 5 minutes</b><span>iCloud has not delivered interview-07.mp4 yet</span></div><button class="btn">Try again</button><button class="btn">Skip</button></div>
+      <div class="basis"><span class="tag">MEASURED</span> · a wall-clock bound around the blocking read (policy ON) or a poll after <code>startDownloadingUbiquitousItem</code>. The bound is yours; the OS offers none. "Skip" takes effect at the next file — nothing cancels inside a blocking copy.</div>
+    </div>
+
+    <div class="row">
+      <div class="ui"><div class="dot ok"></div><div class="t"><b>All 36,201 files uploaded</b><span>21 still uploading · checked 40 s ago</span></div></div>
+      <div class="basis"><span class="tag">MEASURED</span> · per-file <code>URLResourceValues.ubiquitousItemIsUploaded</code> / <code>IsUploading</code>, no ubiquity container needed. Count a package as <em>one</em> item — its contents answer <code>nil</code>, not <code>false</code>.</div>
+    </div>
+
+    <div class="row">
+      <div class="ui"><div class="dot warn"></div><div class="t"><b>99% copied, not yet safe</b><span>522 files missing from the mirror · last complete backup 2 days ago</span></div><button class="btn primary">Back up</button></div>
+      <div class="basis"><span class="tag">MEASURED</span> · a dry run of the real copy, source against mirror, by size and mtime — never by reading mirror bytes. This is the only sentence that answers "is my stuff in there?"</div>
+    </div>
+
+    <div class="row">
+      <div class="ui"><div class="dot blue"></div><div class="t"><b>Kept locally — 31,134 of 36,201 files are in the cloud only</b><span>reading any of them will download it first</span></div></div>
+      <div class="basis"><span class="tag">MEASURED</span> · one <code>stat</code> per file, no side effects. You can always <em>count</em> placeholders; you cannot promise what the count will be tomorrow.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="pill no">NOT POSSIBLE</span> What no public API supports</h2>
+    <p>Two research passes and Apple's own headers: nothing to build these from.</p>
+
+    <div class="row">
+      <div class="ui"><div class="pie"></div><div class="t"><b class="strike">Downloading… 40%</b><span>Google Drive / OneDrive / Dropbox</span></div></div>
+      <div class="basis"><span class="tag">NOT FOUND</span> · no per-file percent for third-party File Providers. <code>st_blocks</code> reads 0 until it reads 100% — providers stage the download and swap the file in atomically.</div>
+    </div>
+
+    <div class="row">
+      <div class="ui"><div class="pie"></div><div class="t"><b class="strike">Downloading… 40%</b><span>iCloud Drive, from a sandboxed app</span></div></div>
+      <div class="basis"><span class="tag">UNMEASURED</span> · <code>NSMetadataUbiquitousItemPercentDownloadedKey</code> exists on paper; whether a sandboxed third-party app can read it for a file outside its container on a File-Provider-backed iCloud is the one open probe. Until measured, this row lives here.</div>
+    </div>
+
+    <div class="row">
+      <div class="ui"><div class="dot bad"></div><div class="t"><b class="strike">Cancel</b><span>mid-file</span></div></div>
+      <div class="basis"><span class="tag">MEASURED</span> · a blocking read or <code>copyItem</code> parks in the kernel with no timeout; <code>Task.cancel()</code> cannot break it. Only your own bound returns control, at the next file boundary.</div>
+    </div>
+
+    <div class="row">
+      <div class="ui"><div class="dot bad"></div><div class="t"><b class="strike">About 2 minutes remaining</b><span>ETA</span></div></div>
+      <div class="basis"><span class="tag">NOT FOUND</span> · no rate, no percent, no queue position. Finder's own pie comes from the provider extension's <code>Progress</code>, which the system consumes and does not republish.</div>
+    </div>
+
+    <div class="row">
+      <div class="ui"><div class="dot bad"></div><div class="t"><b class="strike">These files will stay downloaded</b><span>a promise about eviction</span></div></div>
+      <div class="basis"><span class="tag">MEASURED</span> · re-eviction after materialising took 2 minutes once and more than 4 minutes another time; there is no clock. Finder's <em>Keep Downloaded</em> sets an undocumented xattr with no API and a ten-item limit. You may <em>ask</em> (<code>startDownloadingUbiquitousItem</code>); you may not <em>promise</em>.</div>
+    </div>
+
+    <div class="row">
+      <div class="ui"><div class="dot bad"></div><div class="t"><b class="strike">You have plenty of free space, so nothing will be evicted</b></div></div>
+      <div class="basis"><span class="tag">MEASURED</span> · 31,134 of 36,201 files were evicted with 189 GiB free on a 926 GiB disk. Eviction here follows age of access, and Apple publishes no threshold.</div>
+    </div>
+  </section>
+
+  <section>
+    <h2><span class="pill lie">MISLEADING</span> Easy to render, reads as reassurance, and is not true</h2>
+    <p>Each of these has shipped somewhere, in good faith. The fix is usually one honest word more, not less UI.</p>
+
+    <div class="row">
+      <div class="ui"><div class="dot ok"></div><div class="t"><b>Backed up ✓</b><span>the job ran and exited</span></div></div>
+      <div class="basis">A launchd job that spawned, wrote a log line and exited 0 has proved that a job ran. Under launchd the copier runs with materialisation <em>off</em>; openrsync hit one evicted file, aborted, and left every later file stale — with exit status from the last stage of a pipeline. "Ran" is not "copied"; "copied" is not "uploaded".</div>
+    </div>
+
+    <div class="row">
+      <div class="ui"><div class="spinner"></div><div class="t"><b>Importing…</b><span>no bound, no provider named</span></div></div>
+      <div class="basis">A spinner over a blocking read is the June-2026 hang: under policy ON the syscall waits forever for a provider that may never answer, and the app has told the user nothing it could have told them — which store, that it is a download, and when it will give up.</div>
+    </div>
+
+    <div class="row">
+      <div class="ui"><div class="dot ok"></div><div class="t"><b>Downloaded 100%</b><span>size matches</span></div></div>
+      <div class="basis"><code>st_size</code> is the <em>logical</em> size and is correct on a placeholder with zero bytes on disk. Only <code>SF_DATALESS</code> (or <code>totalFileAllocatedSize == 0</code>) tells you the bytes are not here.</div>
+    </div>
+
+    <div class="row">
+      <div class="ui"><div class="dot ok"></div><div class="t"><b>All backups healthy</b><span>checked 4 days ago</span></div></div>
+      <div class="basis">A green headline over a stale check. The checker itself had been unable to start for four days; nothing it said was current. A verdict must carry its age, and an old verdict is not a verdict.</div>
+    </div>
+
+    <div class="row">
+      <div class="ui"><div class="dot ok"></div><div class="t"><b>Optimise Mac Storage keeps your recent files on this Mac</b></div></div>
+      <div class="basis">Apple's wording is "when space is needed" and "recent files"; neither is defined, and the measured behaviour is eviction by age regardless of space. Present it as the system's description of its own behaviour, never as your app's guarantee.</div>
+    </div>
+  </section>
+
+  </div>
+
+  <footer>Companion to the <a href="../README.md">ground-truth README</a>. The reader/writer split matters: a reader may wait
+  and should say for whom; a writer must never read the destination and must verify by metadata. What both may always do is
+  count placeholders, name the provider, set a bound, and carry the age of every verdict.</footer>
+</main>
+</body>
+</html>
