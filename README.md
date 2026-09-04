@@ -19,6 +19,8 @@ tempted to make. The aim is the best useful representation of the truth in a UI 
 without misleading anyone, and without breaking the mental model the system has
 built for them.
 
+**See it as UI first:** [What you can tell the user →](https://cassiocassio.github.io/iCloud-wizzard-behind-the-curtain/mockups/what-you-can-tell-the-user.html) — the possible, the impossible and the misleading, drawn as rows.
+
 Everything below carries a tag: **MEASURED** (this Mac, date given, probe in
 [`probes/`](probes/), output in [`results/`](results/)), **APPLE** (documentation,
 man page, header), **SOURCE** (read in Apple's open source), **COMMUNITY**, or
@@ -132,9 +134,9 @@ facts, each with its age.
 age of every verdict. **Neither** may promise that a file will stay local, that
 eviction will not happen, or how long a fetch will take.
 
-The mockup [`mockups/what-you-can-tell-the-user.html`](mockups/what-you-can-tell-the-user.html)
+The mockup **[What you can tell the user →](https://cassiocassio.github.io/iCloud-wizzard-behind-the-curtain/mockups/what-you-can-tell-the-user.html)**
 draws the three lists — possible, not possible, misleading — as rows you can
-compare against your own.
+compare against your own (source: [`mockups/`](mockups/)).
 
 ## 5. Beliefs that turned out to be wrong
 
