@@ -91,6 +91,15 @@ to avoid the wait, and it does nothing for a writer.
 
 ## 4. What this means for your UI — reader or writer, decide which
 
+**Where the illusion cracks.** A researcher clicks a 4K recording of a focus group
+that has not been on the actual Mac for some weeks. Nothing happens for a while.
+There is an uncomfortable *is it broken or not?* moment, and the app has no accurate
+statement of activity to offer and no way to set an expectation about how long the
+file might take to arrive. Or they drag what look like ordinary video files into a
+project to analyse, and the import appears to hang while the bytes are fetched. In
+both cases the person did nothing wrong, the system is doing exactly what it
+promised, and the app is the only party that could have said so.
+
 **A reader** (you need the bytes: importing, playing, indexing) may wait, and the
 truthful UI is a *label with a name and a bound*: "Waiting for iCloud Drive…",
 "Downloading from OneDrive…", then "still waiting after N minutes — try again /
